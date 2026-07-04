@@ -17,10 +17,11 @@ export default defineManifest({
   content_scripts: [
     {
       js: ['src/content/main.ts'],
-      matches: ['https://*/*'],
+      matches: ['*://*.google.com/search*'],
+      // matches: ['https://*/*'],
     },
   ],
-  permissions: ['sidePanel', 'contentSettings'],
+  permissions: ['sidePanel', 'contentSettings', 'storage'],
   side_panel: {
     default_path: 'src/sidepanel/index.html',
   },
