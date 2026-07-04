@@ -262,9 +262,13 @@ const ob = setupIntersectionObserver(async (_, page) => {
     return
   }
 
-  const newPage = await iframify(page + 1, ({ page }) => {
+  const newPage = await iframify(page + 1, ({ page, iframe }) => {
     lastIframeLoadedTime = Date.now()
     console.log(`page ${page} loaded time is ${lastIframeLoadedTime}`)
+
+    if (settings.autoUpdatePagination) {
+      extractUrls(iframe.contentDocument)
+    }
 
     const delay = timeLeft()
     if (delay) {
