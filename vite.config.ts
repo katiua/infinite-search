@@ -12,11 +12,7 @@ export default defineConfig({
       '@': `${path.resolve(__dirname, 'src')}`,
     },
   },
-  plugins: [
-    crx({ manifest }),
-    zip({ outDir: 'release', outFileName: `crx-${name}-${version}.zip` }),
-    unocss(),
-  ],
+  plugins: [crx({ manifest }), zip({ outDir: 'release', outFileName: `crx-${name}-${version}.zip` }), unocss()],
   server: {
     cors: {
       origin: [/chrome-extension:\/\//],
