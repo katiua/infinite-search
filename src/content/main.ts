@@ -18,6 +18,8 @@ const SELECTORS = {
   PAGE_CELL: 'td.NKTSme',
   PAGE_ANCHOR: 'a[aria-label*="Page"]',
   FOOTER: '#sfooter',
+  HEADER: '[jscontroller="Zby8rf"]',
+  APP_BAR: '[jscontroller="O63OXd"]',
 }
 const urls = new Map<number, string>()
 const settings = await localSettings.get()
@@ -63,17 +65,17 @@ const extractUrls = (doc: Document | null = document) => {
   return [...pagination.querySelectorAll<HTMLAnchorElement>(SELECTORS.PAGE_ANCHOR)].reduce(_extract, urls)
 }
 
-const removePagination = (root: Document) => {
-  const pagination = root.querySelector(SELECTORS.PAGINATION)
+const hidePagination = (root: Document) => {
+  const pagination = root.querySelector<HTMLElement>(SELECTORS.PAGINATION)
   if (pagination) {
-    pagination.remove()
+    pagination.style.display = 'none'
   }
 }
 
-const removeFooter = (root: Document) => {
-  const footer = root.querySelector(SELECTORS.FOOTER)
+const hideFooter = (root: Document) => {
+  const footer = root.querySelector<HTMLElement>(SELECTORS.FOOTER)
   if (footer) {
-    footer.remove()
+    footer.style.display = 'none'
   }
 }
 
@@ -82,7 +84,7 @@ const removeFooter = (root: Document) => {
  * @param page The page number. 1-based.
  * @param onLoaded The callback to be called when the iframe is loaded
  */
-const iframify = async (page: number, onLoaded?: (page: number) => void) => {
+const iframify = async (page: number, onLoaded?: (ctx: { page: number; iframe: HTMLIFrameElement }) => void) => {
   const url = urls.get(page)
   const iframe = document.createElement('iframe') // create the unstyled iframe
 
@@ -117,17 +119,17 @@ const iframify = async (page: number, onLoaded?: (page: number) => void) => {
     }
 
     // remove the duplicate elements
-    removePagination(doc)
+    hidePagination(doc)
     // remove header
-    const header = doc.querySelector('[jscontroller="Zby8rf"]')
+    const header = doc.querySelector<HTMLElement>(SELECTORS.HEADER)
     if (header) {
-      header.remove()
+      header.style.display = 'none'
     }
 
     // remove footer
-    removeFooter(doc)
+    hideFooter(doc)
 
-    const bar = doc.querySelector('[jscontroller="O63OXd"]')
+    const bar = doc.querySelector<HTMLElement>(SELECTORS.APP_BAR)
     if (bar) {
       // const extra =
       //   pageLocated !== 1 && page === pageLocated + 1
@@ -140,7 +142,10 @@ const iframify = async (page: number, onLoaded?: (page: number) => void) => {
       `
     }
 
-    onLoaded?.(page)
+    onLoaded?.({
+      page,
+      iframe,
+    })
   }
 
   return iframe
@@ -246,8 +251,8 @@ const createLoadingEl = () => {
 extractUrls()
 
 const { showLoading, hideLoading } = createLoadingEl()
-removePagination(document)
-removeFooter(document)
+hidePagination(document)
+hideFooter(document)
 
 const ob = setupIntersectionObserver(async (_, page) => {
   console.log('observing page', page)
@@ -257,7 +262,7 @@ const ob = setupIntersectionObserver(async (_, page) => {
     return
   }
 
-  const newPage = await iframify(page + 1, (page) => {
+  const newPage = await iframify(page + 1, ({ page }) => {
     lastIframeLoadedTime = Date.now()
     console.log(`page ${page} loaded time is ${lastIframeLoadedTime}`)
 
