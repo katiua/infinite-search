@@ -1,8 +1,11 @@
 name: Build Extension
 
 on:
-  release:
-    types: [published]
+  push:
+    tags:
+      - 'v*'
+
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -15,25 +18,30 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+          run_install: false
+
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
+          cache: pnpm
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Build
-        run: npm run build
+        run: pnpm build
 
       - name: Create ZIP
         run: |
           cd dist
-          zip -r ../infinite-search-${{ github.event.release.tag_name }}.zip .
+          zip -r ../infinite-search-${{ github.ref_name }}.zip .
 
-      - name: Upload Release Asset
+      - name: Upload Release
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            infinite-search-${{ github.event.release.tag_name }}.zip
+          files: infinite-search-${{ github.ref_name }}.zip
