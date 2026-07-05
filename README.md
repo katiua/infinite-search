@@ -4,7 +4,10 @@ A chrome extension that enables infinite scrolling for search results.
 
 ## Installation
 
-Download the extension from the [Chrome Web Store](https://chromewebstore.google.com/).
+1. Download from [Releases](https://github.com/katiua/infinite-search/releases).
+2. Extract the zip file.
+3. Open Chrome, go to `chrome://extensions/`, and enable Developer Mode.
+4. Drag and drop the extracted folder into the Chrome window.
 
 ## Credits
 
