@@ -21,8 +21,12 @@ export default defineManifest({
       // matches: ['https://*/*'],
     },
   ],
-  permissions: ['sidePanel', 'contentSettings', 'storage'],
+  permissions: ['sidePanel', 'contentSettings', 'storage', 'tabs'],
   side_panel: {
     default_path: 'src/sidepanel/index.html',
   },
+  // options_ui: {
+  //   open_in_tab: true,
+  //   page: 'src/popup/index.html',
+  // },
 })
