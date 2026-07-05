@@ -1,3 +1,4 @@
+import { defaultLogger } from '@/utils/logger'
 import { localSettings } from '@/utils/settings'
 
 declare global {
@@ -10,8 +11,6 @@ declare global {
   }
 }
 
-console.log('[CRXJS] Hello world from content script!')
-
 const SELECTORS = {
   // PAGINATION: 'table[role=presentation]',
   PAGINATION: '[id="botstuff"] [role="navigation"]',
@@ -23,6 +22,8 @@ const SELECTORS = {
 }
 const urls = new Map<number, string>()
 const settings = await localSettings.get()
+defaultLogger.mount(settings.debug) // enable debug logging
+console.green('extension loaded 🎉')
 /** Whether the document is first loaded. Use to {@linkcode extractUrls extract the initial page number}. */
 let isFirstLoaded = true
 /** The initial page number when the document first loads */
@@ -48,7 +49,7 @@ const extractUrls = (doc: Document | null = document) => {
       document.documentElement.dataset.observer = 'true'
       document.documentElement.dataset.page = initialPage.toString()
     } else {
-      console.log('initial page number not found')
+      console.red('initial page number not found')
     }
     isFirstLoaded = false
   }
@@ -92,7 +93,7 @@ const iframify = async (page: number, onLoaded?: (ctx: { page: number; iframe: H
   const res = await fetch(url)
 
   if (!res.ok) {
-    console.log(`page ${page} fetch failed`)
+    console.red(`page ${page} fetch failed`)
     return iframe
   }
 
@@ -255,16 +256,16 @@ hidePagination(document)
 hideFooter(document)
 
 const ob = setupIntersectionObserver(async (_, page) => {
-  console.log('observing page', page)
+  console.gray(`observe page ${page}, start loading page ${page + 1}`)
   if (page > urls.size) {
     ob.cleanup()
-    console.log('all pages loaded')
+    console.gray('all pages loaded')
     return
   }
 
   const newPage = await iframify(page + 1, ({ page, iframe }) => {
     lastIframeLoadedTime = Date.now()
-    console.log(`page ${page} loaded time is ${lastIframeLoadedTime}`)
+    console.gray(`page ${page} loaded time is ${lastIframeLoadedTime}`)
 
     if (settings.autoUpdatePagination) {
       extractUrls(iframe.contentDocument)
@@ -273,18 +274,18 @@ const ob = setupIntersectionObserver(async (_, page) => {
     const delay = timeLeft()
     if (delay) {
       showLoading()
-      console.log(`show loading spinner when starting page ${page}`)
+      console.gray(`show loading spinner when starting page ${page}`)
     }
     setTimeout(() => {
       ob.observeLast()
       hideLoading()
-      console.log(`hide loading spinner`)
+      console.gray(`hide loading spinner`)
     }, delay)
   })
 
   // insert the new page before the loading element
   document.body.insertBefore(newPage, loadingEl)
 
-  console.log(`page ${page} inset completed`)
+  console.green(`page ${page + 1} insert completed`)
 })
 // #endregion Process
