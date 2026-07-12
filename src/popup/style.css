@@ -18,7 +18,7 @@ input[type='checkbox'] {
   --width: 52px;
   --height: 28px;
   --padding: 4px;
-  --border-radius: 6px;
+  --border-radius: 999px;
 
   --thumb-size: calc(var(--height) - var(--padding) * 2);
   --thumb-end: calc(var(--width) - var(--thumb-size) - var(--padding));
