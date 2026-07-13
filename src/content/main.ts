@@ -114,11 +114,6 @@ const iframify = async (page: number, onLoaded?: (ctx: { page: number; iframe: H
 
     iframe.style.height = `${height - 200}px` // minus the height of the removed elements
 
-    if (settings.autoUpdatePagination) {
-      // update the URLS map
-      extractUrls(iframe.contentDocument)
-    }
-
     // remove the duplicate elements
     hidePagination(doc)
     // remove header
