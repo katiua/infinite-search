@@ -20,7 +20,21 @@ const SELECTORS = {
   HEADER: '[jscontroller="Zby8rf"]',
   APP_BAR: '[jscontroller="O63OXd"]',
 }
-const urls = new Map<number, string>()
+let lastPage = 0
+const urls = new Proxy(new Map<number, string>(), {
+  get(target, prop) {
+    if (prop === 'set') {
+      return (key: number, value: string) => {
+        const result = target.set(key, value)
+        lastPage = Math.max(lastPage, key)
+        return result
+      }
+    }
+
+    const value = Reflect.get(target, prop, target)
+    return typeof value === 'function' ? value.bind(target) : value
+  },
+})
 const settings = await localSettings.get()
 defaultLogger.mount(settings.debug) // enable debug logging
 console.green('extension loaded 🎉')
@@ -252,7 +266,7 @@ hideFooter(document)
 
 const ob = setupIntersectionObserver(async (_, page) => {
   console.gray(`observe page ${page}, start loading page ${page + 1}`)
-  if (page > urls.size) {
+  if (page >= lastPage) {
     ob.cleanup()
     console.gray('all pages loaded')
     return
