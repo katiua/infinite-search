@@ -9,7 +9,8 @@
     "build": "tsc && vite build",
     "lint": "eslint . && prettier --check .",
     "lint:fix": "eslint --fix . && prettier --write . ",
-    "prepare": "husky"
+    "prepare": "husky",
+    "release": "node scripts/release.js"
   },
   "devDependencies": {
     "@crxjs/vite-plugin": "^2.4.0",
