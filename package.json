@@ -2,7 +2,7 @@
   "name": "infinite-search",
   "description": "A chrome extension that enables infinite scrolling for search results.",
   "type": "module",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "scripts": {
     "dev": "vite",
